@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tfHotelTaMapper">
+
+    <select id="selectHotel" resultType="com.example.homework.repository.vo.TfHotelTaVo">
+        SELECT
+            HOTEL_TA_ID,
+            HOTEL_NM,
+            HOTEL_ADRES
+        FROM
+            TF_HOTEL_TA
+        WHERE
+            HOTEL_NM LIKE '%' || #{keyword} || '%'
+            AND LANG_CODE = 'ko'
+    </select>
+
+</mapper>

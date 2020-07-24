@@ -1,0 +1,16 @@
+spring:
+
+  # 서버 재시작 없이 정적 리소스 리로딩 가능하도록
+  devtools:
+    livereload:
+      enabled: true
+
+  datasource:
+    hikari:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: jdbc:log4jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=*******)(PORT=1521))(FAILOVER=on)(LOAD_BALANCE=off))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=orcl)))
+      username: ******
+      password: ******
+
+  jackson:
+    default-property-inclusion: non_null     # '값 = NULL' 일 경우 JSON 전송 안 함.

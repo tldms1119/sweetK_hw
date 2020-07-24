@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+           rel = "stylesheet">
+    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <title>Hotel</title>
+</head>
+<script type="text/javascript">
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : '********',
+            cookie     : true,
+            xfbml      : true,
+            version    : 'v7.0'
+        });
+
+        FB.AppEvents.logPageView();
+
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+
+    FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+    });
+
+
+    function checkLoginState() {
+        FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+        });
+    }
+
+    function statusChangeCallback(response){
+        if(response.status === 'connected'){
+            console.log("connected success!");
+            $("#loginBtn").hide();
+            $("#readPost").show();
+            FB.api(
+                "/me",
+                function (response) {
+                    console.log("Successful Login => " + response.name);
+                }
+            )
+        } else if (response.data === 'not_authorized') {
+            console.log("사용자가 Facebook 에 로그인 했지만, 앱에 로그인 하지 않았습니다.");
+            $("#readPost").hide();
+        } else {
+            console.log("사용자가 Facebook 에 로그인하지 않았습니다.");
+            $("#readPost").hide();
+        }
+
+    }
+
+    function readPost(){
+        FB.api(
+                '/me',
+                'GET',
+                {"fields":"id,name,posts"},
+                function(response) {
+                    console.log(response);
+                    if(!response.error){
+                        $("#postTable").show();
+                        let data = response.posts.data;
+                        $.each(data, function (index, item) {
+                            let tmp = '<tr><td>' + (index+1) + '</td><td>' + item.message
+                                    + '</td><td>' + new Date(item.created_time).toDateString()
+                                    + '</td><td>' + new Date(item.created_time).toTimeString().substring(0, 8) + '</td></tr>';
+                            $('.tbody').append(tmp);
+                        });
+                    } else {
+                        alert("새로고침 후, 다시 로그인 해주세요!");
+                    }
+                }
+        );
+    }
+</script>
+<body>
+    <div style="text-align: center">
+        <h2>Facebook 글 가져오기</h2>
+        <div style="width: 300px; margin: auto;"id="loginBtn">
+            <fb:login-button
+                    scope="public_profile,email"
+                    onlogin="checkLoginState();">
+            </fb:login-button>
+        </div>
+        <div>
+            <button id="readPost" onclick="readPost()" hidden>Read Post</button>
+        </div>
+
+        <br/>
+        <div style="width: 800px; margin: auto;">
+            <table id="postTable" style="border-style: dashed; margin: auto; width: 800px" hidden>
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Message</th>
+                    <th>Created Date</th>
+                    <th>Created Time</th>
+                </tr>
+                </thead>
+                <tbody class="tbody">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

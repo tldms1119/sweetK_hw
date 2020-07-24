@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+           rel = "stylesheet">
+    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <title>Hotel</title>
+</head>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#hotelTable').hide();
+        $('#searchKeyword').autocomplete({
+            source: function(request, response){
+                $.ajax({
+                    url : "/hw1/keyword?query=" + $('#searchKeyword').val(),
+                    type : "GET",
+                    dataType : "json",
+                    cache : false,
+                    success : function(data) {
+                        response (
+                            $.map(data, function(item, key){
+                                return {
+                                    label: key,
+                                    value: key,
+                                    type: item
+                                };
+                            })
+                        )
+                    },
+                    error : function(request, error) {
+                        alert("Error");
+                    }
+                });
+            },
+            minLength: 1,
+            select: function(event, ui){
+                search();
+            }
+        }).data("ui-autocomplete")._renderItem = function(ul, item) {
+            if(item.type === 'my'){
+                return $("<li></li>")
+                        .data("ui-autocomplete-item", item)
+                        .append("<a>(최근 검색어)<strong>" + item.label + "</strong></a>")
+                        .appendTo(ul);
+            } else {
+                return $("<li></li>")
+                        .data("ui-autocomplete-item", item)
+                        .append("<a>" + item.label + "</a>")
+                        .appendTo(ul);
+            }
+        };
+    });
+
+    function search(){
+        let keyword = $('#searchKeyword').val();
+        $.ajax({
+            url : "/hw1/search?keyword=" + keyword,
+            type : "GET",
+            dataType : "json",
+            cache : false,
+            success : function(data) {
+                $('#searchKeyword').val('');
+                $('.tbody').empty();
+                $.each(data, function (index, item) {
+                    let tmp = '<tr><td>' + item.hotelNm + '</td><td>' + item.hotelAdres + '</td></tr>';
+                    $('.tbody').append(tmp);
+                });
+                $('#hotelTable').show();
+            },
+            error : function(request, error) {
+                alert("Error");
+                $('#searchKeyword').val('');
+            }
+        });
+    }
+
+</script>
+<body>
+    <div style="text-align: center">
+        <h1>Hotel</h1>
+        <div style="width: 300px; margin: auto;">
+            <input id="searchKeyword" placeholder="Search Keyword" maxlength="30"/>
+            <button onClick="search()">search</button>
+        </div>
+
+        <br/>
+        <div style="width: 800px; margin: auto;">
+            <table id="hotelTable" style="border-style: dashed; margin: auto">
+                <thead>
+                    <tr>
+                        <th>Hotel Name</th>
+                        <th>Hotel Address</th>
+                    </tr>
+                </thead>
+                <tbody class="tbody">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>
